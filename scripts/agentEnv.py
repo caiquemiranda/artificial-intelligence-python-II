@@ -36,52 +36,53 @@ class Rob_body(Environment):
         self.history = [(self.rob_x, self.rob_y)] # history of (x,y) positions
         self.wall_history = [] # history of hitting the wall
 
-        def percepts(self):
-            
-            return {'rob_x_pos':self.rob_x, 
-                    'rob_y_pos':self.rob_y,
-                    'rob_dir':self.rob_dir,
-                    'whisker':self.whisker() ,
-                    'crashed':self.crashed}
-            
-        initial_percepts = percepts # use percept function for initial percepts too
+    def percepts(self):
+        
+        return {'rob_x_pos':self.rob_x, 
+                'rob_y_pos':self.rob_y,
+                'rob_dir':self.rob_dir,
+                'whisker':self.whisker() ,
+                'crashed':self.crashed}
+        
+    initial_percepts = percepts # use percept function for initial percepts too
 
-        def do(self,action):
-            """ action is {'steer':direction}
-            direction is 'left', 'right' or 'straight'
-            """
-    
-            if self.crashed:
-            
-                return self.percepts()
-            
-            direction = action['steer']
-            compass_deriv = {'left':1,
-                             'straight':0,
-                             'right':-1}[direction] * self.turning_angle
+    def do(self,action):
+        """ action is {'steer':direction}
+        direction is 'left', 'right' or 'straight'
+        """
 
-            self.rob_dir = (self.rob_dir + compass_deriv +360)%360 # make in range [0,360)
-            
-            rob_x_new = self.rob_x + math.cos(self.rob_dir*math.pi/180)
-            rob_y_new = self.rob_y + math.sin(self.rob_dir*math.pi/180)
-            
-            path = ((self.rob_x,self.rob_y),(rob_x_new,rob_y_new))
-
-            if any(line_segments_intersect(path,wall) for wall in self.env.walls):
-                self.crashed = True
-                if self.plotting:
-                    plt.plot([self.rob_x],[self.rob_y],"r*",markersize=20.0)
-                    plt.draw()
-                
-            self.rob_x, self.rob_y = rob_x_new, rob_y_new
-            self.history.append((self.rob_x, self.rob_y))
-            if self.plotting and not self.crashed:
-                plt.plot([self.rob_x],[self.rob_y],"go")
-                plt.draw()
-                plt.pause(self.sleep_time)
-            
+        if self.crashed:
+        
             return self.percepts()
         
+        direction = action['steer']
+        compass_deriv = {'left':1,
+                            'straight':0,
+                            'right':-1}[direction] * self.turning_angle
+
+        self.rob_dir = (self.rob_dir + compass_deriv +360)%360 # make in range [0,360)
+        
+        rob_x_new = self.rob_x + math.cos(self.rob_dir*math.pi/180)
+        rob_y_new = self.rob_y + math.sin(self.rob_dir*math.pi/180)
+        
+        path = ((self.rob_x,self.rob_y),(rob_x_new,rob_y_new))
+
+        if any(line_segments_intersect(path,wall) for wall in self.env.walls):
+            self.crashed = True
+            if self.plotting:
+                plt.plot([self.rob_x],[self.rob_y],"r*",markersize=20.0)
+                plt.draw()
+            
+        self.rob_x, self.rob_y = rob_x_new, rob_y_new
+        self.history.append((self.rob_x, self.rob_y))
+        if self.plotting and not self.crashed:
+            plt.plot([self.rob_x],[self.rob_y],"go")
+            plt.draw()
+            plt.pause(self.sleep_time)
+        
+        return self.percepts()
+    
+    
     def whisker(self):
         """returns true whenever the whisker sensor intersects with a wall
         """
@@ -102,6 +103,7 @@ class Rob_body(Environment):
                 plt.draw()
         
         return hit
+
 
 def line_segments_intersect(linea, lineb):
     """returns true if the line segments, linea and lineb intersect.
