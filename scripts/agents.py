@@ -1,3 +1,6 @@
+# imports
+from scripts.display import Displayable
+import matplotlib.pyplot as plt
 import random
 
 class Agent(object):
@@ -12,21 +15,22 @@ class Agent(object):
 
         raise NotImplementedError("go") # abstract method
 
-# scripts/agents.py
-from scripts.display import Displayable
 
 class Environment(Displayable):
+
     def initial_percepts(self):
         """returns the initial percepts for the agent"""
 
         raise NotImplementedError("initial_percepts") # abstract method
+
 
     def do(self,action):
         """does the action in the environment
         returns the next percept """
 
         raise NotImplementedError("do") # abstract method
-# scripts/agents.py
+
+
 class TP_env(Environment):
     prices = [234, 234, 234, 234, 255, 255, 275, 275, 211, 211, 211,
     234, 234, 234, 234, 199, 199, 275, 275, 234, 234, 234, 234, 255,
@@ -57,6 +61,7 @@ class TP_env(Environment):
         return {'price': price,
                 'instock': self.stock}
 
+
     def do(self, action):
         """does action (buy) and returns percepts (price and instock)"""
 
@@ -78,7 +83,7 @@ class TP_env(Environment):
         return {'price': price,
                 'instock': self.stock}
 
-# scripts/agents.py
+
 def pick_from_dist(item_prob_dist):
     """ returns a value from a distribution.
     item_prob_dist is an item:probability dictionary, where the
@@ -96,8 +101,8 @@ def pick_from_dist(item_prob_dist):
     raise RuntimeError(str(item_prob_dist)+" is not a probability distribution")
 
 
-# scripts/agents.py
 class TP_agent(Agent):
+
     def __init__(self, env):
         self.env = env
         self.spent = 0
@@ -123,14 +128,9 @@ class TP_agent(Agent):
             self.ave = self.ave+(self.last_price-self.ave)*0.05
             self.instock = percepts['instock']
             
-            # scripts/agents.py
+
 env = TP_env()
 ag = TP_agent(env)
-#ag.go(90)
-#ag.spent/env.time ## average spent per time period
-
-# scripts/agents.py
-import matplotlib.pyplot as plt
 
 class Plot_prices(object):
     """Set up the plot for history of price and number in stock"""
@@ -143,6 +143,7 @@ class Plot_prices(object):
         plt.xlabel("Time")
         plt.ylabel("Number in stock. Price.")
 
+
     def plot_run(self):
         """plot history of price and instock"""
 
@@ -153,6 +154,3 @@ class Plot_prices(object):
 
         #plt.legend(loc="upper left")
         plt.draw()
-
-# pl = Plot_prices(ag,env)
-# ag.go(90); pl.plot_run()
