@@ -14,4 +14,11 @@ class Displayable(object):
 
         if level <= self.max_display_level:
             print(*args, **nargs) ##if error you are using Python2 not Python3
-            
+
+
+    def visualize(func):
+        """A decorator for algorithms that do interactive visualization.
+        Ignored here.
+        """
+
+        return func 
