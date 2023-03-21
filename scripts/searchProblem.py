@@ -57,4 +57,151 @@ class Arc(object):
         else:
             return str(self.from_node) + " --> " + str(self.to_node)
         
+# scripts/searchProblem.py
+class Search_problem_from_explicit_graph(Search_problem):
+    """
+    A search problem consists of:
+    * a list or set of nodes
+    * a list or set of arcs
+    * a start node
+    * a list or set of goal nodes
+    * a dictionary that maps each node into its heuristic value.
+    * a dictionary that maps each node into its (x,y) position
+    """
+
+    def __init__(self, nodes, 
+                 arcs, start = None,
+                 goals = set(), hmap = {},
+                 positions = {}):
         
+        self.neighs = {}
+        self.nodes = nodes
+    
+        for node in nodes:
+            self.neighs[node]=[]
+            self.arcs = arcs
+    
+        for arc in arcs:
+            self.neighs[arc.from_node].append(arc)
+            self.start = start
+            self.goals = goals
+            self.hmap = hmap
+            self.positions = positions
+
+
+    def start_node(self):
+        """
+        returns start node
+        """
+        
+        return self.start
+
+
+    def is_goal(self,node):
+        """
+        is True if node is a goal
+        """
+        
+        return node in self.goals
+
+
+    def neighbors(self,node):
+        """
+        returns the neighbors of node
+        """
+    
+        return self.neighs[node]
+    
+    
+    def heuristic(self,node):
+        """
+        Gives the heuristic value of node n.
+        Returns 0 if not overridden in the hmap.
+        """
+        
+        if node in self.hmap:
+            return self.hmap[node]
+        
+        else:
+            return 0
+
+    def __repr__(self):
+        """
+        returns a string representation of the search problem
+        """
+        
+        res=""
+        for arc in self.arcs:
+            res += str(arc)+". "
+        
+        return res
+    
+class Path(object):
+    """
+    A path is either a node or a path followed by an arc
+    """
+
+    
+    def __init__(self,initial,arc=None):
+        """
+        initial is either a node (in which case arc is None) or
+        a path (in which case arc is an object of type Arc)
+        """
+        
+        self.initial = initial
+        self.arc=arc
+        
+        if arc is None:
+            self.cost=0
+        
+        else:
+            self.cost = initial.cost + arc.cost
+
+    def end(self):
+        """
+        returns the node at the end of the path
+        """
+        
+        if self.arc is None:
+            return self.initial
+        else:
+            return self.arc.to_node
+
+
+    def nodes(self):
+        """
+        enumerates the nodes for the path.
+        This starts at the end and enumerates nodes in the path
+        backwards.
+        """
+        
+        current = self
+        
+        while current.arc is not None:
+            yield current.arc.to_node
+            current = current.initial
+        yield current.initial
+
+    def initial_nodes(self):
+        """
+        enumerates the nodes for the path before the end node.
+        This starts at the end and enumerates nodes in the path
+        backwards.
+        """
+        
+        if self.arc is not None:
+            yield from self.initial.nodes()
+
+    def __repr__(self):
+        """
+        returns a string representation of a path
+        """
+        
+        if self.arc is None:
+            return str(self.initial)
+        
+        elif self.arc.action:
+            return (str(self.initial) + "\n --" + str(self.arc.action) + "--> " + str(self.arc.to_node))
+    
+        else:
+            return str(self.initial) + " --> " + str(self.arc.to_node)        
